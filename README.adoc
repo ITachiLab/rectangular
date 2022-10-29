@@ -1,0 +1,5 @@
+= Rectangular
+
+Rectangular is a Windows utility that quietly sits in a notification area and waits for you wanting to rearrange windows. Whether you are a keyboard master or mouse lover, you can use either to quickly change position and size of windows -- keyboard shortcuts for former and pop-up menu for latter groups.
+
+If you suspect this app being a clone of https://rectangleapp.com[MacOS's Rectangle], you are correct. I'm using MacOS on a daily basis and I really love Rectangle for its simplicity and the fact that it just works. The goal of Rectangular is to do exactly the same: be simple and do the job. Since I couldn't find a proper Windows app that satisfies these two goals, I decided to write my own.
