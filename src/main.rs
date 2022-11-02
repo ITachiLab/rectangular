@@ -1,17 +1,58 @@
 use windows::{
-    core::*, Win32::Foundation::*, Win32::UI::WindowsAndMessaging::*, Win32::System::Threading::*,
+    core::*, Win32::Foundation::*, Win32::UI::WindowsAndMessaging::*,
+    Win32::System::LibraryLoader::GetModuleHandleA
 };
+
+const WINDOW_CLASS_NAME: PCSTR = s!("main");
+const WINDOW_NAME: PCSTR = s!("Rectangular");
 
 fn main() -> Result<()> {
     unsafe {
-        let event = CreateEventW(None, true, false, None)?;
-        SetEvent(event).ok()?;
-        WaitForSingleObject(event, 0);
-        CloseHandle(event).ok()?;
+        let instance = GetModuleHandleA(None)?;
 
-        MessageBoxA(None, s!("Hello"), s!("Caption"), MB_OK);
-        MessageBoxW(None, w!("World"), w!("Caption"), MB_OK);
+        let wc = WNDCLASSA {
+            style: Default::default(),
+            lpfnWndProc: Some(wndproc),
+            hInstance: instance,
+            lpszClassName: WINDOW_CLASS_NAME,
+            ..Default::default()
+        };
+
+        RegisterClassA(&wc);
+        CreateWindowExA(
+            WINDOW_EX_STYLE::default(),
+            WINDOW_CLASS_NAME,
+            WINDOW_NAME,
+            WINDOW_STYLE::default(),
+            0,
+            0,
+            0,
+            0,
+            HWND_MESSAGE,
+            None,
+            instance,
+            None,
+        );
+
+        let mut message = MSG::default();
+
+        while GetMessageA(&mut message, HWND(0), 0, 0).into() {
+            TranslateMessage(&message);
+            DispatchMessageA(&message);
+        }
     }
 
     Ok(())
+}
+
+extern "system" fn wndproc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+    unsafe {
+        match message {
+            WM_DESTROY => {
+                PostQuitMessage(0);
+                LRESULT(0)
+            }
+            _ => DefWindowProcA(window, message, wparam, lparam),
+        }
+    }
 }
