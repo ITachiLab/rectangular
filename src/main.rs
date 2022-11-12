@@ -1,6 +1,11 @@
+#![windows_subsystem = "windows"]
+
 use windows::{
     core::*, Win32::Foundation::*, Win32::UI::WindowsAndMessaging::*,
     Win32::System::LibraryLoader::GetModuleHandleA
+};
+use rectangular::{
+    notification
 };
 
 const WINDOW_CLASS_NAME: PCSTR = s!("main");
@@ -19,7 +24,8 @@ fn main() -> Result<()> {
         };
 
         RegisterClassA(&wc);
-        CreateWindowExA(
+
+        let window_handle = CreateWindowExA(
             WINDOW_EX_STYLE::default(),
             WINDOW_CLASS_NAME,
             WINDOW_NAME,
@@ -34,8 +40,9 @@ fn main() -> Result<()> {
             None,
         );
 
-        let mut message = MSG::default();
+        notification::add_notification_icon(instance, window_handle);
 
+        let mut message = MSG::default();
         while GetMessageA(&mut message, HWND(0), 0, 0).into() {
             TranslateMessage(&message);
             DispatchMessageA(&message);
