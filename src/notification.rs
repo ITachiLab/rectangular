@@ -51,3 +51,13 @@ pub unsafe fn add_notification_icon(instance: HINSTANCE, main_window: HWND) {
     Shell_NotifyIconA(NIM_SETVERSION, &icon_data)
         .expect("Could not set version of notification icon.");
 }
+
+pub unsafe fn delete_notification_icon(main_window: HWND) {
+    let icon_data = NOTIFYICONDATAA {
+        hWnd: main_window,
+        uID: ICON_UID,
+        ..Default::default()
+    };
+
+    Shell_NotifyIconA(NIM_DELETE, &icon_data);
+}
