@@ -17,13 +17,16 @@
 //! settings, help or possibility to exit the application.
 
 use std::mem;
+
 use windows::core::{
-    PCSTR, GUID,
-};
-use windows::Win32::{
-    Foundation::*, UI::WindowsAndMessaging::*, UI::Shell::*,
+    GUID, PCSTR,
 };
 use windows::s;
+use windows::Win32::{
+    Foundation::*, UI::Shell::*, UI::WindowsAndMessaging::*,
+};
+
+use crate::WM_NIACTION;
 
 /// Application internal ID of the notification icon.
 const ICON_UID: u32 = 1;
@@ -47,7 +50,7 @@ impl Default for NotificationIcon {
     fn default() -> Self {
         NotificationIcon {
             window_handle: Default::default(),
-            icon_handle: Default::default()
+            icon_handle: Default::default(),
         }
     }
 }
@@ -68,7 +71,7 @@ impl NotificationIcon {
             hWnd: self.window_handle,
             uID: ICON_UID,
             uFlags: NIF_MESSAGE | NIF_INFO | NIF_ICON | NIF_TIP | NIF_STATE | NIF_SHOWTIP,
-            uCallbackMessage: crate::rectangular_window::WM_NIACTION,
+            uCallbackMessage: WM_NIACTION,
             hIcon: self.icon_handle,
             szTip: [CHAR(0); 128],
             dwState: NOTIFY_ICON_STATE(0),
