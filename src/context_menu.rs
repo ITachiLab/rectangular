@@ -66,7 +66,7 @@ impl ContextMenu {
     ///
     /// The method follows the recommended way of showing menus in order to avoid glitches:
     /// [TrackPopupMenu#Remarks](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-trackpopupmenu#remarks).
-    pub fn show(&self, wparam: WPARAM) -> LRESULT {
+    pub fn show(&self, wparam: WPARAM) {
         let x = low_word_signed!(wparam.0);
         let y = high_word_signed!(wparam.0);
 
@@ -76,8 +76,6 @@ impl ContextMenu {
                            x as i32, y as i32, 0, self.window_handle, None);
             PostMessageA(self.window_handle, WM_NULL, WPARAM(0), LPARAM(0));
         }
-
-        LRESULT(0)
     }
 }
 
