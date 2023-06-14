@@ -13,6 +13,7 @@ pub mod context_menu;
 pub mod rectangular_window;
 pub mod control_center;
 pub mod app_window;
+pub mod wndproc;
 
 /// A window class used by all Rectangular windows.
 pub const WINDOW_CLASS_NAME: PCSTR = s!("Rectangular_Common_Class");
