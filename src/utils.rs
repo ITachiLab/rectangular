@@ -73,3 +73,55 @@ macro_rules! high_word_signed {
         (($x as u32 >> 16) & 0xFFFF) as i16
     }
 }
+
+/// Create a window object, and get its reference-counting pointer, along with a raw pointer.
+///
+/// This is a helper macro for use within `new` methods of structures implementing window
+/// behaviour. The macro creates a new [`Rc`] with a [`RefCell`] wrapping a concrete implementation
+/// of the window, then it creates a clone of that pointer (effectively incrementing a number of
+/// strong references), puts the clone on a heap, and makes it an unmanaged raw pointer.
+///
+/// The macro returns a tuple where the first element is the original [`Rc`] pointer, and the other
+/// element is the raw pointer which was placed on a heap. The raw pointer must be given to
+/// [`CreateWindowExA`] function, so it's passed to `WM_CREATE` message where it's stored within the
+/// window's memory, while the original [`Rc`] can be either discarded, or stored for future
+/// interactions with the instance.
+///
+/// It's crucial to remember about a proper deallocation of the raw pointer.
+///
+/// # Examples
+///
+/// In the below example, the original pointer is discarded, so the only entity keeping the
+/// `MyWindow` object alive is a raw pointer created from the cloned original pointer. Since the
+/// raw pointer is not owned by anything yet, it will keep the `MyWindow` alive until it's properly
+/// dropped (usually by reclaiming it with [`Box::from_raw`]).
+///
+/// ```
+/// pub fn new(instance: HINSTANCE) {
+///     let (_, raw) = make_window_object!(MyWindow);
+///
+///     unsafe {
+///         CreateWindowExA(
+///             WS_EX_PALETTEWINDOW,
+///             WINDOW_CLASS_NAME,
+///             s!(""),
+///             WS_POPUP | WS_THICKFRAME | WS_VISIBLE,
+///             0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,
+///             HWND::default(),
+///             None,
+///             instance,
+///             Some(raw),
+///         );
+///     }
+/// }
+/// ```
+#[macro_export]
+macro_rules! make_window_object {
+    ($x:ty) => {
+        {
+            let rc = Rc::new(RefCell::new(<$x>::default()));
+            let boxed = Box::new(Rc::clone(&rc) as Rc<RefCell<dyn AppWindow>>);
+            (rc, Box::into_raw(boxed) as *mut Rc<RefCell<dyn AppWindow>> as *const c_void)
+        }
+    }
+}

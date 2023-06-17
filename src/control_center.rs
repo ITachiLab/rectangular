@@ -12,7 +12,7 @@ use windows::Win32::Foundation::{HINSTANCE, HWND, LPARAM, LRESULT, POINT, RECT, 
 use windows::Win32::UI::WindowsAndMessaging::*;
 
 use crate::app_window::AppWindow;
-use crate::{high_word_signed, low_word, low_word_signed, WINDOW_CLASS_NAME};
+use crate::{high_word_signed, low_word, low_word_signed, make_window_object, WINDOW_CLASS_NAME};
 
 const WINDOW_WIDTH: i32 = 300;
 const WINDOW_HEIGHT: i32 = 200;
@@ -53,9 +53,7 @@ impl AppWindow for ControlCenter {
 
 impl ControlCenter {
     pub fn new(instance: HINSTANCE) -> Rc<RefCell<ControlCenter>> {
-        let my_rc = Rc::new(RefCell::new(ControlCenter::default()));
-        let boxed = Box::new(Rc::clone(&my_rc) as Rc<RefCell<dyn AppWindow>>);
-        let raw = Box::into_raw(boxed);
+        let (ptr, raw) = make_window_object!(ControlCenter);
 
         unsafe {
             CreateWindowExA(
@@ -67,11 +65,11 @@ impl ControlCenter {
                 HWND::default(),
                 None,
                 instance,
-                Some(raw as *const Rc<RefCell<dyn AppWindow>> as *const c_void),
+                Some(raw),
             );
         }
 
-        my_rc
+        ptr
     }
 
     /// Show the Control Center window.
