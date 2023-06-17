@@ -16,7 +16,7 @@ use windows::Win32::UI::WindowsAndMessaging::*;
 use crate::app_window::AppWindow;
 use crate::context_menu::ContextMenu;
 use crate::control_center::ControlCenter;
-use crate::{low_word, WINDOW_CLASS_NAME, WM_NIACTION};
+use crate::{low_word, make_window_object, WINDOW_CLASS_NAME, WM_NIACTION};
 use crate::notification::NotificationIcon;
 
 /// A name of the main application window.
@@ -88,9 +88,7 @@ impl AppWindow for RectangularWindow {
 
 impl RectangularWindow {
     pub fn new(instance: HINSTANCE) -> Rc<RefCell<RectangularWindow>> {
-        let my_rc = Rc::new(RefCell::new(RectangularWindow::default()));
-        let boxed = Box::new(Rc::clone(&my_rc) as Rc<RefCell<dyn AppWindow>>);
-        let raw = Box::into_raw(boxed);
+        let (ptr, raw) = make_window_object!(RectangularWindow);
 
         unsafe {
             CreateWindowExA(
@@ -102,10 +100,10 @@ impl RectangularWindow {
                 HWND_MESSAGE,
                 None,
                 instance,
-                Some(raw as *const Rc<RefCell<dyn AppWindow>> as *const c_void),
+                Some(raw),
             );
         }
 
-        my_rc
+        ptr
     }
 }
