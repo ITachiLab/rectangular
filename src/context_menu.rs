@@ -65,7 +65,7 @@ impl ContextMenu {
     /// these coordinates to show a context menu.
     ///
     /// The method follows the recommended way of showing menus in order to avoid glitches:
-    /// [TrackPopupMenu#Remarks](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-trackpopupmenu#remarks).
+    /// https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-trackpopupmenu#remarks.
     pub fn show(&self, wparam: WPARAM) {
         let x = low_word_signed!(wparam.0);
         let y = high_word_signed!(wparam.0);
