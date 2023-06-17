@@ -1,3 +1,4 @@
+//! This module is fully dedicated to the `main` method.
 #![windows_subsystem = "windows"]
 
 use windows::core::Result;
@@ -9,6 +10,10 @@ use rectangular::rectangular_window::RectangularWindow;
 use rectangular::WINDOW_CLASS_NAME;
 use rectangular::wndproc::wndproc;
 
+/// The entry point of Rectangular.
+///
+/// The main method contains the basic setup of the application, which includes creation of the
+/// window class, and entering the message loop.
 fn main() -> Result<()> {
     unsafe {
         let app_instance = GetModuleHandleA(None)

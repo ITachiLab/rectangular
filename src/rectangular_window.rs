@@ -1,7 +1,8 @@
-//! This module is dedicated to main window.
+//! This module is dedicated to the main application window.
 //!
 //! [`RectangularWindow`] implements behaviour of the main application window which is a so-called
-//! "message-only window".
+//! "message-only window", that means it isn't visible to the user, but it can receive messages, and
+//! create other windows.
 
 use std::cell::RefCell;
 use std::ffi::c_void;
@@ -55,7 +56,6 @@ impl AppWindow for RectangularWindow {
         self.notification_icon.add_to_window();
 
         self.context_menu = ContextMenu::new(window);
-
         self.control_center = ControlCenter::new(app_instance);
 
         LRESULT(0)
@@ -87,7 +87,6 @@ impl AppWindow for RectangularWindow {
 }
 
 impl RectangularWindow {
-    /// Create a new system window and a [`RectangularWindow`] instance.
     pub fn new(instance: HINSTANCE) -> Rc<RefCell<RectangularWindow>> {
         let my_rc = Rc::new(RefCell::new(RectangularWindow::default()));
         let boxed = Box::new(Rc::clone(&my_rc) as Rc<RefCell<dyn AppWindow>>);
